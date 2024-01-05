@@ -3,7 +3,7 @@
 
 int main(){
 
-    printf("%zu\n",strcspn("hello",""));
+    printf("%zu\n",strcspn("hello there","t"));
 
     return 0;
 
