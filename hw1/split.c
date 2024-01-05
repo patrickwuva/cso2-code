@@ -1,3 +1,4 @@
+#include <stdlib.h>
 char **string_split(const char *input, const char *sep, int *num_words){
     
     char **arr = (char **)malloc(2 * sizeof(char *));
@@ -7,6 +8,7 @@ char **string_split(const char *input, const char *sep, int *num_words){
         arr[i] = " ";
     }
 
-        sdqa    
+    if(num_words == 0)
+        return arr;
 
 }
