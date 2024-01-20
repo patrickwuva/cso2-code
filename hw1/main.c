@@ -20,8 +20,11 @@ int main(int argc, char *argv[]){
     }
     
     char input[4000];
-    while(fgets(input, 4000, stdin) != NULL){ // need to change this to exit if .
+    while(fgets(input, 4000, stdin) != NULL){ 
         // call the split.c with input;
+        if(strlen(input) == 2 && input[0] == '.'){
+            return 0;
+        }
         memset(input, 0, sizeof(input));
     }
 }
