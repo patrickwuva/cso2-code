@@ -3,8 +3,8 @@
 
 int main(){
 
-    printf("%zu\n",strcspn("hello there","t"));
-
+    char **list;
+    printf("%s\n"list[0]);
     return 0;
 
 }
