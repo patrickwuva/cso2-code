@@ -13,7 +13,7 @@ char **string_split(const char *input, const char *sep, int *num_words){
         tmp[1] = '\0';
     
         if(strcspn(sep,tmp) != strlen(sep)){
-            if(slist[*num_words] == NULL && *num_words !=0){
+            if(*num_words !=0){
                 slist = realloc(slist, 1+(*num_words * sizeof(char*)));
             }
             
@@ -25,6 +25,9 @@ char **string_split(const char *input, const char *sep, int *num_words){
             printf("splitting str: %s\n",buffer);
             memset(buffer, 0, sizeof(buffer));
         }
+        /*else{
+            printf("%c\n",input[i]);
+        }*/
     }
     return slist;
 }

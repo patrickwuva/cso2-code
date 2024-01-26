@@ -14,7 +14,7 @@ int main(int argc, char *argv[]){
     char **result;
 
     if(argc == 1){
-        sep = " \t";// bug here
+        sep = " \t";
     }
 
     else{
