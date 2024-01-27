@@ -12,22 +12,23 @@ char **string_split(const char *input, const char *sep, int *num_words){
         tmp[0] = input[i];
         tmp[1] = '\0';
     
-        if(strcspn(sep,tmp) != strlen(sep)){
+        if(strcspn(sep,tmp) != strlen(sep) || i == (int)strlen(input) - 1){
             if(*num_words !=0){
-                slist = realloc(slist, 1+(*num_words * sizeof(char*)));
+                slist = realloc(slist, (1+*num_words) * sizeof(char*));
             }
-            
+    
             strncpy(buffer,input+(last_i),i-last_i);
+            buffer[i-last_i] = '\0';
+            
             slist[*num_words] = (char*)malloc(strlen(buffer) * sizeof(char));
             strncpy(slist[*num_words],buffer,strlen(buffer));
             *num_words += 1;
-            last_i = i;
-            printf("splitting str: %s\n",buffer);
-            memset(buffer, 0, sizeof(buffer));
+            last_i = i+1;
+            
+            //printf("splitting str: %s\n",buffer);
+            
+            memset(buffer,'\0',sizeof(buffer));
         }
-        /*else{
-            printf("%c\n",input[i]);
-        }*/
     }
     return slist;
 }

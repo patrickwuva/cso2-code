@@ -21,7 +21,7 @@ int main(int argc, char *argv[]){
         for(int i = 1; i < argc; i++){
             strcat(sep, argv[i]);
         }
-        sep =(char *)realloc(sep,sizeof(char)*strlen(sep));
+        sep = (char *)realloc(sep,sizeof(char)*strlen(sep));
     }
     
     char input[4000];
