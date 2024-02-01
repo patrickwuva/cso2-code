@@ -5,14 +5,28 @@
 
 int size = 0;
 
-void print_result(char **result){
+void cleanup(char **result){
 
-    printf("num words %d\n",size);
+    for(int i = 0; i< size; i++){
+        free(result[i]);
+    }
+    free(result);
 }
+
+void print_result(char **result){
+    
+    for(int i = 0; i < size; i++){
+        printf("[%s]",result[i]);    
+    }
+    printf("\n");
+    cleanup(result);
+}
+
 int main(int argc, char *argv[]){
-    char* sep = (char *)malloc(500 * sizeof(char));
+    char* sep = (char *)malloc(100 * sizeof(char));
     char **result;
 
+    sep[0] = '\0';
     if(argc == 1){
         sep = " \t";
     }
@@ -27,6 +41,7 @@ int main(int argc, char *argv[]){
     char input[4000];
     while(fgets(input, 4000, stdin) != NULL){ 
         if(strlen(input) == 2 && input[0] == '.'){
+            free(sep);
             return 0;
         }
         result = string_split(input, sep, &size);
