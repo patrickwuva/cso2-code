@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
 char **string_split(const char *input, const char *sep, int *num_words){
    
     int last_i = 0;
@@ -19,13 +20,11 @@ char **string_split(const char *input, const char *sep, int *num_words){
     
             strncpy(buffer,input+(last_i),i-last_i);
             buffer[i-last_i] = '\0';
-            
+           
             slist[*num_words] = (char*)malloc(strlen(buffer) * sizeof(char));
             strncpy(slist[*num_words],buffer,strlen(buffer));
             *num_words += 1;
             last_i = i+1;
-            
-            //printf("splitting str: %s\n",buffer);
             
             memset(buffer,'\0',sizeof(buffer));
         }
