@@ -14,7 +14,7 @@ void cleanup(char **result){
 }
 
 void print_result(char **result){
-    
+    printf("num words %d\n",size);
     for(int i = 0; i < size; i++){
         printf("[%s]",result[i]);    
     }
@@ -44,9 +44,11 @@ int main(int argc, char *argv[]){
             free(sep);
             return 0;
         }
+        input[strlen(input) -1] = '\0';
+        printf("input %s\n",input);
         result = string_split(input, sep, &size);
         print_result(result);
-        memset(input, 0, sizeof(input));
+        memset(input, '\0', sizeof(input));
         size = 0;
     }
 }
