@@ -3,9 +3,10 @@
 
 int main(){
 
-    puts("hi");
-    puts(" ");
-    puts("hello");
+    char sep[4] = "XYZ";
+    char tmp[2] = "A";
+
+    printf("%zu\n",strcspn(sep,tmp));
     return 0;
 
 }
