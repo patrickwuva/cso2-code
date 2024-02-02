@@ -45,7 +45,6 @@ int main(int argc, char *argv[]){
             return 0;
         }
         input[strlen(input) -1] = '\0';
-        printf("input %s\n",input);
         result = string_split(input, sep, &size);
         print_result(result);
         memset(input, '\0', sizeof(input));
