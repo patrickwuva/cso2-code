@@ -1,8 +1,9 @@
-CC = clang
-CFLAGS=-Wall
+CC=clang
+#CFLAGS=-fsanitize=address -ftrivial-auto-var-init=pattern
+CFLAGS=-ftrivial-auto-var-init=pattern
+#CFLAGS=-Wall
+split: split.o main.o
+	$(CC) $(CFLAGS) split.o main.o -o $@
 
-all: split.o main.o:
-	$(CC) $(CFLAGS) split.o main.o -o split
-
-%.o: %.c split.h
+%.o: %.c split.c
 	$(CC) $(CFLAGS) -o $@ -c $<

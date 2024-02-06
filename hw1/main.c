@@ -1,10 +1,10 @@
-#include "split.c"
 #include "split.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
-int size = 0;
+int size;
+
 
 void cleanup(char **result){
 
@@ -23,33 +23,28 @@ void print_result(char **result){
 }
 
 int main(int argc, char *argv[]){
-    char* sep = (char *)malloc(100 * sizeof(char));
-    char **result;
+    char *sep = (char *)calloc(100,sizeof(char));
+    char **result = {0};
 
-    sep[0] = '\0';
     if(argc == 1){
-        sep = " \t";
+        strcpy(sep," \t");
     }
 
     else{
         for(int i = 1; i < argc; i++){
             strcat(sep, argv[i]);
         }
-        sep = (char *)realloc(sep,sizeof(char)*strlen(sep));
     }
     
-    char input[4000];
+    char input[4000] = {0};
     while(fgets(input, 4000, stdin) != NULL){ 
         if(strlen(input) == 2 && input[0] == '.'){
-            if(strcmp(" \t",sep) != 0){
-                free(sep);
-            }
+            free(sep);
             return 0;
         }
         input[strlen(input) -1] = '\0';
         result = string_split(input, sep, &size);
-        print_result(result);
+        print_result(result); 
         memset(input, '\0', sizeof(input));
-        size = 0;
     }
 }
