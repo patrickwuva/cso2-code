@@ -1,4 +1,4 @@
-#define _XOPEN_SOURCE 700 // request all POSIX features, even with -std=c11
+#define _XOPEN_SOURCE 600 // request all POSIX features, even with -std=c11
 #include <stdlib.h>       // for EXIT_SUCCESS, NULL, abort
 #include <stdio.h>        // for getline
 #include <unistd.h>       // for getpid
