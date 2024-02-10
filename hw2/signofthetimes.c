@@ -6,7 +6,7 @@
 
 struct timespec s, e;
 long long nsecs(){
-    return (e.tv_sec*1000000000 - s.tv_sec*1000000000) + (e.tv_nsec - s.tv_nsec);
+    return ((e.tv_sec - s.tv_sec)*1000000000) + (e.tv_nsec - s.tv_nsec);
 }
 
 long long get_overhead(){
