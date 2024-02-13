@@ -33,11 +33,11 @@ int main(int argc, char *argv[]){
         }
     
         else if(atoi(argv[1]) == 5){
-            return 0;
+            send_sig();
         }
 
         else if(atoi(argv[1]) == -1){
-            return 0;
+            receive_sig();
         }
     }
     

@@ -1,0 +1,5 @@
+1) 2 nanoseconds
+2) 113 nanoseconds
+3) 3084723 nanoseconds
+4) 1484 nanoseconds
+5) 6837 nanoseconds
