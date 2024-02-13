@@ -1,34 +1,43 @@
 #include "gettimings.h"
 #include <stdio.h>
 #include <unistd.h>
-#include <time.h>
 #include <stdlib.h>
+
+long long overhead;
+
 int main(int argc, char *argv[]){
+    for(int i = 0; i < 1000000; i++){
+        nsecs();
+    }
+
+    overhead = avg_over(1000000);   
     
+
     if(argc == 2){
 
         if(atoi(argv[1]) == 1){
-            time_handle(1);
+            
+            time_empty();
         }
     
         else if(atoi(argv[1]) == 2){
-            time_handle(2);
+            pid();
         }
     
         else if(atoi(argv[1]) == 3){
-            time_handle(3);
+            command();
         }
     
         else if(atoi(argv[1]) == 4){
-            time_handle(4);
+            return 0;
         }
     
         else if(atoi(argv[1]) == 5){
-            time_handle(5);
+            return 0;
         }
 
         else if(atoi(argv[1]) == -1){
-            time_handle(-1);
+            return 0;
         }
     }
     

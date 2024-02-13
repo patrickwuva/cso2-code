@@ -1,10 +1,9 @@
+#define _XOPEN_SOURCE 700
 #ifndef GETTIMINGS_H
 #define GETTIMINGS_H
-//#define _XOPEN_SOURCE 700
-long long get_overhead();
-
+void time_empty();
+void pid();
+void command();
+long long avg_over();
 long long nsecs();
-
-void time_handle(int input);
-void empty();
 #endif
