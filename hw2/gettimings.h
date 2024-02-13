@@ -4,6 +4,7 @@
 void time_empty();
 void pid();
 void command();
+void self_sig();
 long long avg_over();
 long long nsecs();
 #endif

@@ -29,7 +29,7 @@ int main(int argc, char *argv[]){
         }
     
         else if(atoi(argv[1]) == 4){
-            return 0;
+            self_sig();
         }
     
         else if(atoi(argv[1]) == 5){

@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <signal.h>
 
 extern long long overhead;
 long long sum;
@@ -34,6 +35,14 @@ long long avg_over(int t){
     return sum / t;
 }
 
+static void sig_handle(int signum){
+    
+    if(signum == SIGUSR1){
+        printf("sig handler executing \n");
+        fflush(stdout);
+    }
+}
+
 void time_empty(){
     sum = 0;
     for(int i = 0; i < total; i++){
@@ -61,6 +70,24 @@ void command(){
     for(int i = 0; i < total; i++){
         s = nsecs();
         system("/bin/true");
+        e = nsecs();
+        sum += (e - s) - overhead;
+    }
+    printf("time: %lld\n", sum/total);
+}
+
+void self_sig(){
+    sum = 0;
+    total = 20;
+    struct sigaction sa;
+    sa.sa_handler = sig_handle;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART;
+    sigaction(SIGUSR1, &sa, NULL);
+    
+    for(int i = 100; i < total; i++){
+        s = nsecs();
+        kill(getpid(), SIGUSR1);
         e = nsecs();
         sum += (e - s) - overhead;
     }
