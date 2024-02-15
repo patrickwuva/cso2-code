@@ -1,5 +1,5 @@
-1) 2 nanoseconds
-2) 113 nanoseconds
-3) 3084723 nanoseconds
-4) 1484 nanoseconds
-5) 6837 nanoseconds
+Empty avg: 24 nano secs 
+Pid avg: 102 nano secs 
+System avg: 2651288 nano secs 
+Self sig avg: 1623 nano secs 
+Send sig avg: 7126 nano secs 

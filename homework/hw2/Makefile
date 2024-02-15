@@ -1,7 +1,7 @@
 CC = clang
 CFLAGS = -O1
 
-gettimings: main.o signofthetimes.o
+gettimings: main.o signofthetimes.o helpers.c
 	$(CC) -o $@ $^
 
 %.o: %.c gettimings.h
