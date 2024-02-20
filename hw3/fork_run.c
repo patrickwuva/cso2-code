@@ -2,61 +2,96 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
+#include <fcntl.h>
+#include <sys/wait.h>
 
-char *command_to_file(char *command){
-    char output[8000];
 
-    
-    FILE *file;
-    char filename[] = "tmp.txt";
-    file = fopen(filename,"a");
-
-    if(file == NULL){
-        printf("error opening %s\n" filename);
-    }
-    
-    strcat(output,command);
-    strcat(output, " > ");
-    stract(output, filename);
-    
-    execl("/bin/sh","-c",output,NULL);
-    memset(output, 0, sizeof(output));
-    fprintf(file,%s, output);
-    return output;
+long file_size(char *filename){
+    FILE *file = fopen(filename, "r");
+    fseek(file, 0, SEEK_END);
+    long len = ftell(file);
+    fclose(file);
+    return len;
 }
 
+char *read_from_pipe(int fd){
+    ssize_t bytes;
+    char buffer[1024];
+    char filename[] = "tmp.txt";
 
-char *write_to_pipe(char *command){
-    char *output = command_to_file(command);
+    FILE *file = fopen(filename, "w+");
 
-    write(fd[1], output, (strlen(output)+1));
+    ssize_t fbytes;
+    
+    while((fbytes = read(fd,buffer,sizeof(buffer) - 1)) > 0){
+        fwrite(buffer, 1, fbytes, file);
+    }
+    
+    fflush(file);
+    rewind(file);
 
+    long len = file_size(filename);
+
+    char *output = (char*)malloc(len + 1);
+        
+    fread(output, 1, sizeof(output), file);
+    fclose(file);
+    remove(filename);
     return output;
 }
 
 char *getoutput(const char *command){
+    fflush(stdout);
     int pipe_fd[2];
-    char output[8000];
-
     if (pipe(pipe_fd) < 0){
-        printf("error with pipe\n")l
+        printf("error with pipe\n");
         exit(1);
     }
     
     int read_fd = pipe_fd[0];
     int write_fd = pipe_fd[1];
     pid_t child = fork();
-    if (child == 0){
-        close(read_fd);
-        output = write_to_pipe(command);
-        exit();
-    }
-    else{
-        close(write_fd[0]);
-        int staus;
-        pid_t waited = waitpid(child, &status, 0);
     
+    if (child == 0){
+        dup2(write_fd,1);
+        close(write_fd);
+        close(read_fd);
+        execl("/bin/sh", "sh", "-c", command, NULL);
+        _exit(0);
     }
-    return status;
+    
+    else{
+        close(write_fd);   
+        char *output = read_from_pipe(read_fd);
+        close(read_fd);
+        waitpid(child, NULL, 0);
+        return output;
+    }
+    return NULL;
 }
+
+char *parallelgetoutput(int count, const char **argv_base){
+    pid_t pids[count];
+
+    for(int i = 0; i < count; i++){
+        pids[i] = fork();
+        
+        if(pids[i] == 0){
+            
+
+        }
+        
+    }
+
+    return NULL;
+}
+
+
+
+
+
+
+
+
+
 
