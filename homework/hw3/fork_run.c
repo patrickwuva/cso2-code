@@ -38,22 +38,21 @@ char **update_args(const char **argv_base, int c){
     }
     size+=2;
 
-    char **args = malloc((size) * sizeof(char*));
+    char **args = malloc(size * sizeof(char*));
    
     
     for(int i = 0; i < size - 2; i++){
-        args[i] = malloc(strlen(argv_base[i]) + 1);
-        strcpy(args[i], argv_base[i]);
+        args[i] = strdup(argv_base[i]);
     }
     char pidstr[20];
     sprintf(pidstr, "%d", c);
     
-    args[size-2] = malloc(strlen(pidstr) + 1);
-    char *temp1 = pidstr;
-    char *temp2 = NULL;
-   
-    strcpy(args[size - 2], pidstr);
-    args[size - 1] = NULL;
+    args[size-2] = strdup(pidstr);
+    args[size-1] = NULL;
+    
+    for(int i = 0; i<size; i++){
+        printf("%s",args[i]);
+    }
     return args;
 }
 char *getoutput(const char *command){
@@ -89,31 +88,29 @@ char *parallelgetoutput(int count, const char **argv_base){
     int read_fd = pipe_fd[0];
     int write_fd = pipe_fd[1];
     pid_t pid;
+    
 
     for(int i = 0; i < count; i++){
+        char **args = update_args(argv_base, i);    
         pid = fork();
         if(pid == 0){
-            char **updated_args = update_args(argv_base, i);
             close(read_fd);
             dup2(write_fd,1);
             close(write_fd);
-            //char **updated_args = update_args(argv_base);
-            printf("test: %s\n", updated_args[0]);
-            free(updated_args);
+            execv(argv_base[0],args);
             _exit(0);
         } else {
+            free(args);
             close(write_fd);
             char *child_output = read_from_pipe(read_fd);
-            printf("tesdt: %s\n", child_output);
-            printf("test: %zu", strlen(child_output));
-            output = realloc(output, strlen(child_output)+1);
+            output = realloc(output, strlen(output)+strlen(child_output)+1);
             strcat(output, child_output);
+            output[strlen(output)] = '\0';
+            free(child_output);
             close(read_fd);
-  
         }
     }
-    
-
+    while (wait(NULL) > 0);
     return output;
 }
 
