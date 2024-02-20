@@ -18,9 +18,11 @@ int main(){
         }
 
         else if(pid == 0){
-            printf("Child pid %d\n",getpid());
-            sleep(2);
-            _exit(0);
+            char *path = "/bin/echo";
+            char pid_str[32];
+            sprintf(pid_str, "%d", getpid());
+            char *args = {"echo","current pid:",pid_str,NULL}; 
+            execv("/bin/echo",args);
         }
         printf("pid outside loop %d\n", getpid());
     }
