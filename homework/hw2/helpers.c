@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <unistd.h>
+
 extern long long s, e;
 
 long long nsecs(){

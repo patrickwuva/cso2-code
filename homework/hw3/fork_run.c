@@ -40,13 +40,27 @@ char *read_from_pipe(int fd){
     return output;
 }
 
+char **update_args(const char **argv_base){
+    int size = 0;
+    while(argv_base[size] != NULL){
+        size++;    
+    }
+   
+    char **args = malloc(size * sizeof(char*));
+    for(int i = 0; i < size; i++){
+        args[i] = strdup(argv_base[i]);
+    }
+
+    char pidstr[15];
+    sprintf(pidstr, "%d", getpid());
+    args[size-2] = pidstr;
+    args[size-1] = NULL;
+
+    return args;
+}
 char *getoutput(const char *command){
     fflush(stdout);
     int pipe_fd[2];
-    if (pipe(pipe_fd) < 0){
-        printf("error with pipe\n");
-        exit(1);
-    }
     
     int read_fd = pipe_fd[0];
     int write_fd = pipe_fd[1];
@@ -71,19 +85,36 @@ char *getoutput(const char *command){
 }
 
 char *parallelgetoutput(int count, const char **argv_base){
-    pid_t pids[count];
+    fflush(stdout);
+    int pipe_fd[2];
+    char *output = (char*)malloc(1);
+    int read_fd = pipe_fd[0];
+    int write_fd = pipe_fd[1];
+    pid_t pid;
 
     for(int i = 0; i < count; i++){
-        pids[i] = fork();
-        
-        if(pids[i] == 0){
-            
-
+        pid = fork();
+        if(pid == 0){
+            dup2(write_fd,1);
+            close(write_fd);
+            close(read_fd);
+            char **updated_args = update_args(argv_base);
+            execv(argv_base[0], updated_args);
+            free(updated_args);
+            _exit(0);
         }
+    }
+    pid_t child;
+    while ((child = wait(NULL)) > 0){
+        close(write_fd);
+        char *child_output = read_from_pipe(read_fd);
+        output = realloc(output, strlen(child_output)+1);
+        strcat(output, child_output);
+        close(read_fd);
+        free(output);
         
     }
-
-    return NULL;
+    return output;
 }
 
 

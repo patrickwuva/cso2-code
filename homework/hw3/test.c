@@ -22,6 +22,15 @@ int my_system(const char *command){
 }
 
 int main(){
-    my_system("sleep 1; echo hi");
+    const char *arr[] = {"hello","i","am"};
+
+    const char *test[4];
+
+    for(int i = 0; i < 4; i++){
+        test[i] = arr[i];
+    }
+    test[3] = "patrick";
+
+    printf("%s\n",test[3]);
 }
 
