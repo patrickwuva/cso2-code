@@ -22,15 +22,13 @@ int my_system(const char *command){
 }
 
 int main(){
-    const char *arr[] = {"hello","i","am"};
+    int fd = open("test.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    char buffer[1024];
 
-    const char *test[4];
+    dup2(fd,1);
 
-    for(int i = 0; i < 4; i++){
-        test[i] = arr[i];
-    }
-    test[3] = "patrick";
-
-    printf("%s\n",test[3]);
+    close(fd);
+    printf("this shoudl work\n");
+    printf("test");
 }
 
