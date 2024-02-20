@@ -85,6 +85,8 @@ char *parallelgetoutput(int count, const char **argv_base){
     pipe(pipe_fd);
     
     char *output = (char*)malloc(1);
+    output[0] = '\0';
+
     int read_fd = pipe_fd[0];
     int write_fd = pipe_fd[1];
     pid_t pid;
