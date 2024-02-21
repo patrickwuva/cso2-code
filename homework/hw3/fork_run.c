@@ -86,7 +86,6 @@ char *getoutput(const char *command){
 char *parallelgetoutput(int count, const char **argv_base){
     int pipe_fd[2];
     pipe(pipe_fd);
-    
     int read_fd = pipe_fd[0];
     int write_fd = pipe_fd[1];
     pid_t pid;
