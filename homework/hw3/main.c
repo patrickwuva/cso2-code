@@ -10,10 +10,16 @@ int main(){
     printf("Bye\n");    
     */
 
-    const char *argv_base[] = {
+    /*const char *argv_base[] = {
         "/bin/echo", "running", NULL
     };
     const char *output = parallelgetoutput(2, argv_base);
+
+    printf("Text: [%s]\n", output);
+    */
+
+    const char *argv_base[] = { "./args.py", "first", "second", "third", NULL };
+    const char *output = parallelgetoutput(3, argv_base);
 
     printf("Text: [%s]\n", output);
     return 0;
