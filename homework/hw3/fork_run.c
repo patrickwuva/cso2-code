@@ -9,24 +9,30 @@ char *read_from_pipe(int fd){
     char *output = NULL; 
    
     FILE *pipeit = fdopen(fd, "r");
+    
+    if (pipeit == NULL){
+        perror("pipe is dog water");
+        exit(EXIT_FAILURE);
+    }
     size_t size = 0;
     size_t total = 0;
     ssize_t fbytes;
     char *buff = NULL;
-    while ((fbytes = getline(&buff, &size, pipeit)) != -1){
-        output = realloc(output, size + fbytes + 1);
-        if(!output){
+    while ((fbytes = getline(&buff, &size, pipeit)) > -1){
+        char *new_output = realloc(output, total + fbytes + 1);
+        if(!new_output){
             perror("realloc");
             free(buff);
             fclose(pipeit);
+            free(output);
             return NULL;
         } 
+        output = new_output;
         memcpy(output + total, buff, fbytes);
         total += fbytes;
         output[total] = '\0';
     }
     free(buff);
-    fclose(pipeit);
 
     return output;
 }
@@ -50,9 +56,6 @@ char **update_args(const char **argv_base, int c){
     args[size-2] = strdup(pidstr);
     args[size-1] = NULL;
     
-    for(int i = 0; i<size; i++){
-        printf("%s",args[i]);
-    }
     return args;
 }
 char *getoutput(const char *command){
@@ -84,9 +87,6 @@ char *parallelgetoutput(int count, const char **argv_base){
     int pipe_fd[2];
     pipe(pipe_fd);
     
-    char *output = (char*)malloc(1);
-    output[0] = '\0';
-
     int read_fd = pipe_fd[0];
     int write_fd = pipe_fd[1];
     pid_t pid;
@@ -98,29 +98,18 @@ char *parallelgetoutput(int count, const char **argv_base){
         if(pid == 0){
             close(read_fd);
             dup2(write_fd,1);
-            close(write_fd);
             execv(argv_base[0],args);
             _exit(0);
         } else {
             free(args);
-            close(write_fd);
-            char *child_output = read_from_pipe(read_fd);
-            output = realloc(output, strlen(output)+strlen(child_output)+1);
-            strcat(output, child_output);
-            output[strlen(output)] = '\0';
-            free(child_output);
-            close(read_fd);
         }
     }
     while (wait(NULL) > 0);
+    close(write_fd);
+    char *output = read_from_pipe(read_fd);
+    close(read_fd);
     return output;
 }
-
-
-
-
-
-
 
 
 
