@@ -21,7 +21,7 @@ int main(){
             char *path = "/bin/echo";
             char pid_str[32];
             sprintf(pid_str, "%d", getpid());
-            char *args = {"echo","current pid:",pid_str,NULL}; 
+            char *args[] = {"echo","child pid:",pid_str,NULL}; 
             execv("/bin/echo",args);
         }
         printf("pid outside loop %d\n", getpid());
