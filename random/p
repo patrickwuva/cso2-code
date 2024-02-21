@@ -1,0 +1,25 @@
+#!/bin/zsh
+
+push() {
+    if [[ "$1" == "-f" ]]; then
+        git add "$2" && git commit -m "$3" && git push
+    else
+        git add . && git commit -m "$1" && git push
+    fi
+}
+
+if [[ $# -eq 1 ]]; then
+    push "$1"
+
+elif [[ $# -eq 3 ]] && [[ "$1" == "-f" ]]; then
+    push "$1" "$2" "$3"
+    
+elif { [[ $# -eq 1 ]] && [[ "$1" == "-h" ]]; } || [[ $# -eq 0 ]];then
+    echo "usage p <'git message'>"
+    echo "-f for adding a specific file"
+    echo "example pusher -f <filename> 'message'"
+
+else
+    echo "error: make sure the message is wrapped in quotes"
+fi
+
