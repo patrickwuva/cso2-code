@@ -1,4 +1,5 @@
 #include <stdint.h>
-#define LEVELS 2
+#define LEVELS 1
 #define POBITS 12
-typedef uint64_t pageEntry;
+#define PSIZE 4096
+#define ALIGNMENT 8
