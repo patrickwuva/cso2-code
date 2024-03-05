@@ -6,6 +6,7 @@
 #include "config.h"
 #include "mlpt.h"
 
+extern int pages_created;
 void mantest(){
     page_allocate(0x0);
     size_t *pointer_to_table;
@@ -42,6 +43,7 @@ void lvl2test(){
     printf("translate: 0x%zx\n",translate(va1));
     printf("translate: 0x%zx\n",translate(va2));
     printf("translate: 0x%zx\n",translate(va3));
+    printf("done pages created: %d\n",pages_created);
 }
 
 void crazy_test(){

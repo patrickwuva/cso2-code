@@ -7,6 +7,8 @@
 #include "mlpt.h"
 #include "config.h"
 
+int ptc = 100;
+int pages_created = 0;
 size_t ptbr = 0;
 size_t entries = 0;
 size_t va_bits = LEVELS*9;
@@ -43,21 +45,30 @@ size_t* get_pte(size_t va, int lvl){
 
 size_t create_page(){
     void *base = NULL;    
-    posix_memalign(&base, 4096, 4096);
+    ptc = posix_memalign(&base, 4096, 4096);
     memset(base, 0, 4096);
+    pages_created += 1;
     return (size_t)base;
 }
 
 void level_up(size_t va){
     for(int i = 0; i < LEVELS; i++){
         size_t pptr = create_page();
-        if ( i == 0 && ptbr == 0){
-            ptbr = pptr;
+        if ( i == 0){
+            if (ptbr == 0){
+                ptbr = pptr;
+            }
+            else{
+                free((void*)pptr);
+                pages_created -= 1;
+            }
         }
-        else{
+        else {
             if(i != 0){
                 size_t *pte = get_pte(va, i);
-                *pte = ((size_t)(pptr) >> POBITS) << POBITS| 1;
+                if (pte != 0){
+                    *pte = ((size_t)(pptr) >> POBITS) << POBITS| 1;
+               }
             }
         }
     }
@@ -78,15 +89,12 @@ void page_allocate(size_t va){
     if(entries == 0){
         entries = pow(2,POBITS)/almnt;
     }
-    /*if(ptbr == 0){
-        level_up(va);
-    }*/
     level_up(va);
     size_t *pte = get_pte(va, LEVELS);
     if((*pte & 1) == 0) {
         size_t base = create_page();
         *pte = ((size_t)(base)>> POBITS) << POBITS |1;
-        //printf("va: 0x%zx ptbr: 0x%zx pte: 0x%zx pteaddr: 0x%zx  prevaddr: 0x%zx\n",va, ptbr, *pte, pte,get_pte(va,1));
     }
+    //printf("va: 0x%zx ptbr: 0x%zx pte: 0x%zx pteaddr: 0x%zx  prevaddr: 0x%zx\n",va, ptbr, *pte, pte,get_pte(va,1));
     //printf("pa done. pte: 0x%zx pteaddr: 0x%zx ptbr: 0x%zx\n", *pte, pte, ptbr);
 }
