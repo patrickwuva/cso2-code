@@ -64,7 +64,7 @@ void level_up(size_t va){
         }
         else{
             size_t *pte = get_pte(va, i);
-            *pte = ((size_t)(pptr) << POBITS) | 1;
+            *pte = ((size_t)(pptr) >> POBITS) << POBITS| 1;
             //printf("lvl indx: 0x%zx new pte: 0x%zx ptbr: 0x%zx\n", get_lvl_index(get_vpn(va),i), *get_pte(va,i), ptbr); 
             /*if (i == LEVELS -1){
                 pptr = create_page();
