@@ -1,0 +1,111 @@
+// time to cry
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <assert.h>
+#include <string.h>
+#include <math.h>
+#include "mlpt.h"
+#include "config.h"
+
+size_t ptbr = 0;
+size_t entries = 0;
+size_t va_bits = LEVELS*9;
+size_t almnt = 8;
+size_t get_offset(size_t va){
+    return va & ((1UL << POBITS)-1);
+}
+
+size_t get_vpn(size_t va){
+    int vpn_bits = log2(entries)*LEVELS;
+    return (va >> POBITS); //& (1 << vpn_bits)-1;
+}
+
+size_t get_lvl_index(size_t vpn, int lvl){
+    size_t index_bits = log2(entries);
+    //size_t total_bits = LEVELS * index_bits; // total bits of vpn    
+    //printf("lvlindex 0x%zx\n", vpn >> ((LEVELS - lvl)*index_bits) & (1 << index_bits) - 1);
+    return vpn >> ((LEVELS - lvl)*index_bits) & (1 << index_bits) - 1;
+}
+
+size_t *get_pte(size_t va, int lvl){
+    //return &(((size_t *)pptb)[index]); 
+    size_t vpn = get_vpn(va);
+    printf("in pte before index lvl: %d\n", lvl);
+    size_t index = get_lvl_index(vpn, lvl);
+    printf("index : %zu\n", index);
+    size_t address;
+    size_t base = ptbr;
+    size_t* pte = 0;
+    printf("base 0x%zx ptbr 0x%zx\n",base, ptbr);
+    for(int i = 0; i < lvl; i++){
+        pte  = (size_t *)(base) + get_lvl_index(vpn, i+1);
+        address = *pte >> POBITS;
+        base = address;
+    }
+    return pte;
+}
+
+/*void map_time(size_t pptb){
+    printf("entries: %zu\n", entries); 
+    for(size_t i = 0; i < entries; i++){
+        *get_pte(pptb, i) =  ~((size_t)0);
+    }
+}*/
+size_t create_page(){
+    void *base = NULL;    
+    posix_memalign(&base, 4096, 4096);
+    memset(base, 0, 4096);
+    return (size_t)base;
+}
+
+void level_up(size_t va){
+    size_t vpn = get_vpn(va);
+    size_t base;
+    for(int i = 0; i < LEVELS; i++){
+        size_t pptr = create_page();
+        if ( i == 0 ){
+            ptbr = pptr;
+        }
+        else{
+            size_t pre_lv_index = get_lvl_index(vpn, i); //need this to update the page before
+            size_t *pte = get_pte(vpn, i);
+            //if (((*pte & 1) != 1)
+            *pte = (pptr << 12) + 0x001;
+            //printf("pte: 0x%zx\n", pte);
+        }   
+    }
+}
+size_t translate(size_t va){
+    size_t pa = (1UL << 13) - 1;
+    size_t vpn = get_vpn(va);
+    size_t off = get_offset(va);
+    //printf("off : 0x%zx\n",off);
+    printf("rip translate\n");
+    size_t *pte = get_pte(va, LEVELS);
+    //printf("pte: 0x%zx\n",pte);
+    printf("pte in translate: 0x%zx\n",pte);
+    if((*pte & 1) == 1){
+        return (*pte >> 12 << 12) + off; 
+    }
+
+    return ~((size_t)0);
+}
+    
+void page_allocate(size_t va){
+    if(entries == 0){
+        entries = pow(2,POBITS)/almnt;
+    }
+    if(ptbr == 0){
+        level_up(va);
+    }
+    printf("herefart??\n");
+    //printf("lvl index: 0x%zx\n", get_lvl_index(get_vpn(va),1));
+    /*size_t vpn = get_vpn(va);
+    
+    if((*get_pte(ptbr,vpn) & 1) == 0) {
+        size_t base = create_page();
+        size_t *pte = (size_t *)ptbr + vpn;
+        *pte = base+((1UL << POBITS)-1);
+    }*/
+}

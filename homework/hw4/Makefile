@@ -7,7 +7,7 @@ DEPs := mltp.h config.h
 
 LIB := libmlpt.a
 
-all: $(LIB)
+all: $(LIB) test
 
 $(LIB): $(OBJS)
 	ar rcs $@ $(OBJS)
@@ -18,5 +18,7 @@ $(LIB): $(OBJS)
 clean:
 	rm -f $(OBJS) $(LIB)
 
-.PHONY: all clean
+test:
+	$(CC) test.c libmlpt.a -o test
+.PHONY: all clean test
 

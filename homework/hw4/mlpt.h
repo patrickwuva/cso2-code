@@ -21,6 +21,4 @@ size_t translate(size_t va);
  */
 void page_allocate(size_t va);
 
-typedef uint64_t pageEntry;
-
 #endif
