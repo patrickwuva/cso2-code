@@ -7,6 +7,9 @@ DEPs := mltp.h config.h
 
 LIB := libmlpt.a
 
+ifeq ($(d),y)
+CFLAGS += -g
+endif
 all: $(LIB) test
 
 $(LIB): $(OBJS)
@@ -17,8 +20,9 @@ $(LIB): $(OBJS)
 
 clean:
 	rm -f $(OBJS) $(LIB)
-
 test:
-	$(CC) test.c libmlpt.a -lm -o test
+	$(CC) $(CFLAGS) test.c libmlpt.a -lm -o test
+
+
 .PHONY: all clean test
 

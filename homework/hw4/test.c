@@ -22,11 +22,12 @@ void lvl1test(){
     size_t va1 = 0x0;
     size_t va2 = 0x1000;
     assert(ptbr == 0); 
+    page_allocate(va1);
     page_allocate(va2);
-    //printf("translate: 0x%zx\n",translate(va1));
-    //printf("translate: 0x%zx\n",translate(va1));
-    printf("translate: 0x%zx\n",translate(va2));
-    printf("ptfd 0x%zx\n", ptbr);
+    printf("done allocating");
+    printf("translate: 0x%zx\n",translate(va1));
+    printf("translate: 0x%zx\n",translate(va1));
+    //printf("translate: 0x%zx\n",translate(va3));
     //page_allocate(0x22000);:a
     //printf("translate: 0x%zx\n",translate(va2));
 
@@ -35,13 +36,12 @@ void lvl2test(){
     assert(ptbr == 0);
     size_t va1 = 0x0;
     size_t va2 = 0x200000;
-    size_t va0 = 0x1000;
-    size_t va3 = 0x300000;
-    page_allocate(va0);
-    printf("translate: 0x%zx\n",translate(va0));
-    //printf("translate: 0x%zx\n",translate(va0));
-    //page_allocate(va3); 
-   // printf("translate: 0x%zx\n",translate(va3));
+    size_t va3 = 0x400000;
+    page_allocate(va1);
+    page_allocate(va2);
+    printf("translate: 0x%zx\n",translate(va1));
+    printf("translate: 0x%zx\n",translate(va2));
+    printf("translate: 0x%zx\n",translate(va3));
 }
 
 void crazy_test(){
@@ -70,9 +70,9 @@ void crazy_test(){
 
 }
 int main(){
-    //lvl2test();
-    lvl1test();
+    //lvl1test();
+    lvl2test();
     ////printf("\n\n test 2\n");
-    mantest();
+    //mantest();
     return 0;
 }
