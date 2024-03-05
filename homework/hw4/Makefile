@@ -19,6 +19,6 @@ clean:
 	rm -f $(OBJS) $(LIB)
 
 test:
-	$(CC) test.c libmlpt.a -o test
+	$(CC) test.c libmlpt.a -lm -o test
 .PHONY: all clean test
 

@@ -32,7 +32,7 @@ size_t* get_pte(size_t va, int lvl){
     size_t base = ptbr;
     for(int i = 0; i < lvl; i++){
         size_t *pte = (size_t*)base + get_lvl_index(vpn, i+1);
-        printf("pte in getpte: 0x%zx\n", *pte);
+        //printf("pte in getpte: 0x%zx\n", *pte);
         base = *pte >> POBITS;
         //printf("pte: 0x%zx index: 0x%zx\n", *pte, get_lvl_index(vpn, i+1));
         if (i == lvl - 1){
@@ -80,7 +80,7 @@ size_t translate(size_t va){
     //printf("pte in translate: 0x%zx\n",*pte);
     //printf("pte in trlte 0x%zx\n", *pte);
     if((*pte & 1) == 1){
-        return (*pte >> POBITS) + get_offset(va); 
+        return (*pte >> POBITS << POBITS) | get_offset(va); 
     }
 
     return ~((size_t)0);
@@ -98,7 +98,7 @@ void page_allocate(size_t va){
     size_t *pte = get_pte(va, LEVELS);
     if((*pte & 1) == 0) {
         size_t base = create_page();
-        *pte = (size_t)(base) << POBITS |1;
+        *pte = ((size_t)(base)>> POBITS) << POBITS |1;
         //printf("pte pa: 0x%zx index: 0x%zx\n", *get_pte(va, LEVELS), get_lvl_index(get_vpn(va), LEVELS ));
     }
 }
