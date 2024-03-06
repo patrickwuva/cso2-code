@@ -25,9 +25,9 @@ void lvl1test(){
     assert(ptbr == 0); 
     page_allocate(va1);
     page_allocate(va2);
-    printf("done allocating");
     printf("translate: 0x%zx\n",translate(va1));
-    printf("translate: 0x%zx\n",translate(va1));
+    printf("translate: 0x%zx\n",translate(va2));
+    printf("ptrb 0x%zx pages_created %d\n", ptbr, pages_created);
     //printf("translate: 0x%zx\n",translate(va3));
     //page_allocate(0x22000);:a
     //printf("translate: 0x%zx\n",translate(va2));
@@ -49,7 +49,6 @@ void lvl2test(){
 void crazy_test(){
     // 0 pages have been allocated
     assert(ptbr == 0);
-
     page_allocate(0x456789abcdef);
     // 5 pages have been allocated: 4 page tables and 1 data
     assert(ptbr != 0);
@@ -72,8 +71,8 @@ void crazy_test(){
 
 }
 int main(){
-    //lvl1test();
-    lvl2test();
+    lvl1test();
+    //lvl2test();
     ////printf("\n\n test 2\n");
     //mantest();
     return 0;

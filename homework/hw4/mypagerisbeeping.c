@@ -33,11 +33,11 @@ size_t* get_pte(size_t va, int lvl){
     for(int i = 0; i < lvl; i++){
         size_t index = get_lvl_index(vpn, i+1);
         pte = (size_t*)base + index;
-        if(i != lvl - 1 && *pte == 0){
-            //printf("uhoh\n");
+        printf("pte: 0x%zx pteaddr: 0x%zx\n",*pte, pte);
+        if(i != lvl - 1 && pte == 0){
+            printf("uhoh\n");
             return 0;
         }
-        //printf("i: %d pte: 0x%zx index: 0x%zx\n", i, *pte, index);
         base = (*pte >> POBITS) << POBITS;
     }
     return pte;
@@ -45,7 +45,9 @@ size_t* get_pte(size_t va, int lvl){
 
 size_t create_page(){
     void *base = NULL;    
-    ptc = posix_memalign(&base, 4096, 4096);
+    if( posix_memalign(&base, 4096, 4096) != 0){
+        printf("what?\n");
+    }
     memset(base, 0, 4096);
     pages_created += 1;
     return (size_t)base;
@@ -94,6 +96,7 @@ void page_allocate(size_t va){
     if((*pte & 1) == 0) {
         size_t base = create_page();
         *pte = ((size_t)(base)>> POBITS) << POBITS |1;
+        printf("base 0x%zx pte 0x%zx\n", base, pte);
     }
     //printf("va: 0x%zx ptbr: 0x%zx pte: 0x%zx pteaddr: 0x%zx  prevaddr: 0x%zx\n",va, ptbr, *pte, pte,get_pte(va,1));
     //printf("pa done. pte: 0x%zx pteaddr: 0x%zx ptbr: 0x%zx\n", *pte, pte, ptbr);

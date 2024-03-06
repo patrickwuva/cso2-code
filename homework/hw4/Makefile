@@ -10,8 +10,10 @@ LIB := libmlpt.a
 ifeq ($(d),y)
 CFLAGS += -g
 endif
-all: $(LIB) test
-
+ifeq ($(f),y)
+CFLAGS += -fsanitize=address -fno-omit-frame-pointer -g
+endif
+all: $(LIB)
 $(LIB): $(OBJS)
 	ar rcs $@ $(OBJS)
 
