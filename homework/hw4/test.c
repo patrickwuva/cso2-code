@@ -74,14 +74,24 @@ void crazy_test(){
     // 2 new pages allocated (now 8; 5 page table, 3 data)
 
 }
+
+void lvl3(){
+    size_t va0 = 0x20400;
+    page_allocate(va0);
+    page_allocate(va0);
+    printf("t: 0x%zx\n",translate(va0));
+    printf("done\n");
+}
 int main(){
     //maintranstest();
     //*(size_t*)ptbr = 0x1111001;
     //printf("translate: 0x%zx\n", translate(0x0));
     //lvl1test();
     //crazy_test();
-    lvl2test();
+    //lvl2test();
     ////printf("\n\n test 2\n");
     //mantest();
+    lvl3();
+
     return 0;
 }

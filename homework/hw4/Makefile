@@ -1,5 +1,5 @@
 CC = clang
-CFLAGS = -Wall
+CFLAGS = -Wall -Wno-unused-variable
 LDFLAGS = -lm
 SRCS := mypagerisbeeping.c
 OBJS := $(SRCS:.c=.o)
@@ -13,7 +13,7 @@ endif
 ifeq ($(f),y)
 CFLAGS += -g -fsanitize=address
 endif
-all: $(LIB) test
+all: $(LIB) testexe
 $(LIB): $(OBJS)
 	ar rcs $@ $(OBJS)
 
@@ -22,7 +22,7 @@ $(LIB): $(OBJS)
 
 clean:
 	rm -f $(OBJS) $(LIB)
-test:
+testexe:
 	$(CC) $(CFLAGS) test.c libmlpt.a -lm -o test
 
 
