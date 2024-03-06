@@ -11,14 +11,14 @@ ifeq ($(d),y)
 CFLAGS += -g
 endif
 ifeq ($(f),y)
-CFLAGS += -fsanitize=address -fno-omit-frame-pointer -g
+CFLAGS += -g -fsanitize=address
 endif
-all: $(LIB)
+all: $(LIB) test
 $(LIB): $(OBJS)
 	ar rcs $@ $(OBJS)
 
 %.o: %.c $(DEPS)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(LDFLAGS) -c $< -o $@
 
 clean:
 	rm -f $(OBJS) $(LIB)

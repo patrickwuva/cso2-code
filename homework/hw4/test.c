@@ -5,7 +5,7 @@
 #include <string.h>
 #include "config.h"
 #include "mlpt.h"
-
+#include <stdalign.h>
 extern int pages_created;
 void mantest(){
     page_allocate(0x0);
@@ -34,15 +34,19 @@ void lvl1test(){
 
 }
 void lvl2test(){
-    assert(ptbr == 0);
-    size_t va1 = 0x0;
+    size_t va1 = 0x1000;
     size_t va2 = 0x200000;
     size_t va3 = 0x400000;
+    size_t va4 = 0x1ff000;
+    size_t va5 = 0x5ff000;
     page_allocate(va1);
-    page_allocate(va2);
+    //page_allocate(va);
     printf("translate: 0x%zx\n",translate(va1));
-    printf("translate: 0x%zx\n",translate(va2));
-    printf("translate: 0x%zx\n",translate(va3));
+    //printf("translate: 0x%zx\n",translate(va5));
+    //page_allocate(va5);
+    //printf("translate: 0x%zx\n",translate(va4));
+    //printf("translate: 0x%zx\n",translate(va5));
+    //printf("translate: 0x%zx\n",translate(va3));
     printf("done pages created: %d\n",pages_created);
 }
 
@@ -71,9 +75,12 @@ void crazy_test(){
 
 }
 int main(){
+    //maintranstest();
+    //*(size_t*)ptbr = 0x1111001;
+    //printf("translate: 0x%zx\n", translate(0x0));
     //lvl1test();
-    crazy_test();
-    //lvl2test();
+    //crazy_test();
+    lvl2test();
     ////printf("\n\n test 2\n");
     //mantest();
     return 0;
