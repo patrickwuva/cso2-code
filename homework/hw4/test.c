@@ -65,13 +65,14 @@ void crazy_test(){
     // 1 new page allocated (now 6; 4 page table, 2 data)
 
     //assert(translate(0x456789ab0000) != 0xFFFFFFFFFFFFFFFF);
-    
+    printf("translate: 0x%zx\n", translate(0x456789ab0000));
     page_allocate(0x456780000000);
     // 2 new pages allocated (now 8; 5 page table, 3 data)
 
 }
 int main(){
-    lvl1test();
+    //lvl1test();
+    crazy_test();
     //lvl2test();
     ////printf("\n\n test 2\n");
     //mantest();
