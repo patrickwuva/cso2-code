@@ -6,7 +6,7 @@
 #include "config.h"
 #include "mlpt.h"
 #include <stdalign.h>
-extern int pages_created;
+int pages_created;
 void mantest(){
     page_allocate(0x0);
     size_t *pointer_to_table;
@@ -24,9 +24,13 @@ void lvl1test(){
     size_t va2 = 0x1000;
     assert(ptbr == 0); 
     page_allocate(va1);
-    page_allocate(va2);
+    printf("translate: 0x%zx\n",translate(va1));
+    printf("translate: 0x%zx\n",translate(va1));
+    page_allocate(va1);
+    //page_allocate(va2);
     printf("translate: 0x%zx\n",translate(va1));
     printf("translate: 0x%zx\n",translate(va2));
+    printf("translate: 0x%zx\n",translate(va1));
     printf("ptrb 0x%zx pages_created %d\n", ptbr, pages_created);
     //printf("translate: 0x%zx\n",translate(va3));
     //page_allocate(0x22000);:a
@@ -86,12 +90,12 @@ int main(){
     //maintranstest();
     //*(size_t*)ptbr = 0x1111001;
     //printf("translate: 0x%zx\n", translate(0x0));
-    //lvl1test();
+    lvl1test();
     //crazy_test();
     //lvl2test();
     ////printf("\n\n test 2\n");
     //mantest();
-    lvl3();
+    //lvl3();
 
     return 0;
 }
