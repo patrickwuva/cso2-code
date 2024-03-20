@@ -21,21 +21,5 @@ size_t translate(size_t va);
  */
 void page_allocate(size_t va);
 
-typedef struct {
-    size_t* entry;
-    int lvl;
-    size_t index;
-
-} pte;
-
-typedef struct {
-    size_t va;
-    size_t vpn;
-} address;
-
 extern size_t entries;
-pte get_pte(int lvl, size_t va);
-void init_pte(pte *p, int lvl, size_t va);
-void init_va(address *a, size_t va);
-size_t get_offset(size_t va);
 #endif

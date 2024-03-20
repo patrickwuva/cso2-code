@@ -24,13 +24,9 @@ void lvl1test(){
     size_t va2 = 0x1000;
     assert(ptbr == 0); 
     page_allocate(va1);
-    printf("translate: 0x%zx\n",translate(va1));
-    printf("translate: 0x%zx\n",translate(va1));
-    page_allocate(va1);
-    //page_allocate(va2);
+    page_allocate(va2);
     printf("translate: 0x%zx\n",translate(va1));
     printf("translate: 0x%zx\n",translate(va2));
-    printf("translate: 0x%zx\n",translate(va1));
     printf("ptrb 0x%zx pages_created %d\n", ptbr, pages_created);
     //printf("translate: 0x%zx\n",translate(va3));
     //page_allocate(0x22000);:a

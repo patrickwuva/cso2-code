@@ -1,7 +1,7 @@
 CC = clang
 CFLAGS = -Wall -Wno-unused-variable
 LDFLAGS = -lm
-SRCS := mypagerisbeeping.c help.c
+SRCS := mypagerisbeeping.c
 OBJS := $(SRCS:.c=.o)
 DEPs := mltp.h config.h
 
