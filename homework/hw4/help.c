@@ -52,6 +52,11 @@ pte get_pte(size_t va, int lvl){
 }
 
 size_t create_page(){
+    if(ENTRIES == 0){
+        SIZE = pow(2, POBITS);
+        ENTRIES = SIZE/ALMNT;
+    }
+
     void *base = NULL;    
     if( posix_memalign(&base, SIZE, SIZE) != 0){
     }
