@@ -6,7 +6,7 @@
 #include "mlpt.h"
 #include "config.h"
 
-size_t ALMNT = 0;
+size_t ALMNT = 8;
 size_t ENTRIES = 0;
 size_t SIZE = 0;
 
@@ -58,8 +58,6 @@ size_t create_page(){
     }
 
     void *base = NULL;    
-    if( posix_memalign(&base, SIZE, SIZE) != 0){
-    }
     memset(base, 0, SIZE);
     return (size_t)base;
 }
