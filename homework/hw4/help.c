@@ -21,7 +21,6 @@ size_t get_vpn(size_t va){
 size_t get_index(size_t va, int lvl){
     size_t index_bits = log2(ENTRIES);
     size_t vpn = get_vpn(va);
-    //printf("index vpn 0x%zx indexout: 0x%zx\n", vpn, vpn >> ((LEVELS - lvl)*index_bits) & (1 << index_bits) - 1);
     return vpn >> ((LEVELS - lvl)*index_bits) & (1 << index_bits) - 1;
     
 }

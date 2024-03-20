@@ -18,7 +18,6 @@ void level_up(size_t va){
         else {
             if(i != 0){
                 pte p = get_pte(va, i);
-                //printf("pte in lvl 0x%zx *pte 0x%zx\n", p.entry, *p.entry);
                 if (*p.entry == 0){
                     size_t pptr = create_page();
                     *p.entry = ((size_t)(pptr)) | 1;
@@ -34,13 +33,11 @@ size_t translate(size_t va){
     }
 
     pte p = get_pte(va, LEVELS);
-    printf("T pte: 0x%zx *pte 0x%zx\n", p.entry, *p.entry);
     
     if((*p.entry & 1) != 1)
         return ~((size_t)0);
     
     if((*p.entry & 1) == 1){
-        printf("pte 0x%zx offset 0x%zx\n", *p.entry, get_offset(va));
         return (*p.entry >> POBITS << POBITS) | get_offset(va); 
     }
 }
@@ -52,6 +49,5 @@ void page_allocate(size_t va){
     if((*p.entry & 1) == 0) {
         size_t base = create_page();
         *p.entry = (size_t)(base) |1;
-        //printf("in loop pa: 0x%zx pte* 0x%zx index: 0x%zu\n",p.entry, *p.entry, p.index);
     }
 }
