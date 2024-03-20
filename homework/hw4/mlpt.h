@@ -21,5 +21,15 @@ size_t translate(size_t va);
  */
 void page_allocate(size_t va);
 
-extern size_t entries;
+typedef struct {
+    size_t* entry;
+    int lvl;
+    size_t index;
+
+} pte;
+
+size_t get_offset(size_t va);
+size_t create_page();
+pte get_pte(size_t va, int lvl);
+
 #endif
