@@ -96,16 +96,20 @@ void level_up(size_t va){
     }
 }
 size_t translate(size_t va){
+    if (ptbr == 0){
+        return ~((size_t)0);
+    }
+
     if(entries == 0){
         size = pow(2, POBITS);
         entries = size/almnt;
     }
+    
     pte p = get_pte(LEVELS, va);
-    //printf("T pte: 0x%zx *pte 0x%zx index 0x%zx\n", p.entry, *p.entry, p.index);
     if(p.entry == 0)
         return ~((size_t)0);
     if((*p.entry & 1) == 1){
-        return (*p.entry >> POBITS << POBITS) | get_offset(va); 
+        return (*p.entry << POBITS) | get_offset(va); 
     }
     
     return ~((size_t)0);
