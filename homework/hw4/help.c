@@ -58,6 +58,7 @@ size_t create_page(){
     }
 
     void *base = NULL;    
+    posix_memalign(&base, SIZE, SIZE);
     memset(base, 0, SIZE);
     return (size_t)base;
 }
