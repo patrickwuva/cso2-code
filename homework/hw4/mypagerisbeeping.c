@@ -43,6 +43,7 @@ size_t get_index(size_t va, int lvl){
 void init_pte(pte *p, int lvl, size_t va){
     p->index = get_index(va, lvl);
     p->lvl = lvl;
+    p->entry = NULL;
 }
 
 void init_va(address *a, size_t va){
@@ -91,7 +92,7 @@ void level_up(size_t va){
                 pte p = get_pte(i, va);
                 if (p.entry == NULL){
                     size_t pptr = create_page();
-                    *p.entry = (size_t)pptr | 1; //>> POBITS) << POBITS| 1;
+                    *p.entry = ((size_t)(pptr)) | 1; //>> POBITS) << POBITS| 1;
                }
             }
         }
