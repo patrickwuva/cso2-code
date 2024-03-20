@@ -28,51 +28,33 @@ void lvl1test(){
     printf("translate: 0x%zx\n",translate(va1));
     printf("translate: 0x%zx\n",translate(va2));
     printf("ptrb 0x%zx pages_created %d\n", ptbr, pages_created);
-    //printf("translate: 0x%zx\n",translate(va3));
-    //page_allocate(0x22000);:a
-    //printf("translate: 0x%zx\n",translate(va2));
 
 }
 void lvl2test(){
+    size_t va0 = 0x0;
     size_t va1 = 0x1000;
     size_t va2 = 0x200000;
     size_t va3 = 0x400000;
     size_t va4 = 0x1ff000;
     size_t va5 = 0x5ff000;
-    page_allocate(va1);
-    //page_allocate(va);
-    printf("translate: 0x%zx\n",translate(va1));
-    //printf("translate: 0x%zx\n",translate(va5));
-    //page_allocate(va5);
-    //printf("translate: 0x%zx\n",translate(va4));
-    //printf("translate: 0x%zx\n",translate(va5));
-    //printf("translate: 0x%zx\n",translate(va3));
+    page_allocate(va0);
+    page_allocate(va2);
+    printf("translate: 0x%zx\n",translate(va0));
+    printf("translate: 0x%zx\n",translate(va2));
+    page_allocate(va0);
+    printf("translate: 0x%zx\n",translate(va0));
     printf("done pages created: %d\n",pages_created);
 }
 
 void crazy_test(){
-    // 0 pages have been allocated
     assert(ptbr == 0);
     page_allocate(0x456789abcdef);
-    // 5 pages have been allocated: 4 page tables and 1 data
     assert(ptbr != 0);
-
-    //page_allocate(0x456789abcd00);
-    // no new pages allocated (still 5)
-    
     printf("translate: 0x%zx\n", translate(0x456789abcd00));
     printf("translate: 0x%zx\n", translate(0x45B7A9abcd02));
-
-    //assert(translate(0x456789ab0000) == 0xFFFFFFFFFFFFFFFF);
-    
     page_allocate(0x456789ab0000);
-    // 1 new page allocated (now 6; 4 page table, 2 data)
-
-    //assert(translate(0x456789ab0000) != 0xFFFFFFFFFFFFFFFF);
     printf("translate: 0x%zx\n", translate(0x456789ab0000));
     page_allocate(0x456780000000);
-    // 2 new pages allocated (now 8; 5 page table, 3 data)
-
 }
 
 void lvl3(){
@@ -83,15 +65,7 @@ void lvl3(){
     printf("done\n");
 }
 int main(){
-    //maintranstest();
-    //*(size_t*)ptbr = 0x1111001;
-    //printf("translate: 0x%zx\n", translate(0x0));
-    lvl1test();
-    //crazy_test();
-    //lvl2test();
-    ////printf("\n\n test 2\n");
-    //mantest();
-    //lvl3();
+    lvl2test();
 
     return 0;
 }

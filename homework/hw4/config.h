@@ -1,3 +1,3 @@
 #include <stdint.h>
-#define LEVELS 1
+#define LEVELS 2
 #define POBITS 12
