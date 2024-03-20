@@ -34,8 +34,9 @@ size_t translate(size_t va){
     }
 
     pte p = get_pte(va, LEVELS);
+    printf("T pte: 0x%zx *pte 0x%zx\n", p.entry, *p.entry);
     
-    if(p.entry == 0)
+    if((*p.entry & 1) != 1)
         return ~((size_t)0);
     
     if((*p.entry & 1) == 1){

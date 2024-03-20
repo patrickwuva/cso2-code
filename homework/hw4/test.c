@@ -24,9 +24,11 @@ void lvl1test(){
     size_t va2 = 0x1000;
     assert(ptbr == 0); 
     page_allocate(va1);
-    page_allocate(va2);
     printf("translate: 0x%zx\n",translate(va1));
     printf("translate: 0x%zx\n",translate(va2));
+    page_allocate(va2);
+    printf("translate: 0x%zx\n",translate(va2));
+    printf("translate: 0x%zx\n",translate(va1));
     printf("ptrb 0x%zx pages_created %d\n", ptbr, pages_created);
 
 }
@@ -65,7 +67,7 @@ void lvl3(){
     printf("done\n");
 }
 int main(){
-    lvl2test();
-
+    //lvl2test();
+    lvl1test();
     return 0;
 }
