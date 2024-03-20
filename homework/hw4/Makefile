@@ -11,7 +11,7 @@ ifeq ($(d),y)
 CFLAGS += -g
 endif
 ifeq ($(f),y)
-CFLAGS += -g -fsanitize=address
+CFLAGS += -fsanitize=address
 endif
 all: $(LIB) testexe
 $(LIB): $(OBJS)
