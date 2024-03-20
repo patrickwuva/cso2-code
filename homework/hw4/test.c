@@ -19,7 +19,7 @@ void mantest(){
     );
 }
 
-void lvl1test(){
+void lvl1(){
     size_t va1 = 0x0;
     size_t va2 = 0x1000;
     assert(ptbr == 0); 
@@ -32,7 +32,7 @@ void lvl1test(){
     printf("ptrb 0x%zx pages_created %d\n", ptbr, pages_created);
 
 }
-void lvl2test(){
+void lvl2(){
     size_t va0 = 0x0;
     size_t va1 = 0x1000;
     size_t va2 = 0x200000;
@@ -60,14 +60,12 @@ void crazy_test(){
 }
 
 void lvl3(){
-    size_t va0 = 0x20400;
-    page_allocate(va0);
+    size_t va0 = 0x20401;
     page_allocate(va0);
     printf("t: 0x%zx\n",translate(va0));
-    printf("done\n");
+    printf("done ptbr: 0x%zx\n",ptbr);
 }
 int main(){
-    //lvl2test();
-    lvl1test();
+    lvl3();
     return 0;
 }

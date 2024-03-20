@@ -11,7 +11,7 @@ size_t ENTRIES = 0;
 size_t SIZE = 0;
 
 size_t get_offset(size_t va){
-    return va & 0xFFF;
+    return va & (1ULL << POBITS) - 1;
 }
 
 size_t get_vpn(size_t va){
