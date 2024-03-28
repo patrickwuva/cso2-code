@@ -70,7 +70,7 @@ void prevent_optimizations_based_on_knowing_array_values() {
 
 int main() {
     const int MAX = 1048568;
-    const int SKIP = 4;
+    const int SKIP = 256;
     const int ITERS = 64000000;
 
 /* these two lines tell Clang (if used to compile this) not to try to 
@@ -94,8 +94,10 @@ int main() {
     /* This loop performs the actual array accesses described above.
      * This is where most of the data cache accesses are likely to occur.
      */
-    for (int i = 0; i < ITERS; ++i) {
-        j = global_array[j];
+    int size = (1024 * 16) / 2;
+    
+    for (size_t i = 0; i < ITERS; ++i) {
+        j += global_array[(i * SKIP) % 7000 ];
     }
     /* print out j to ensure that the compiler doesn't optimize the array accesses above away */
     printf("%d\n", j);
