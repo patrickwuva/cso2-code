@@ -81,12 +81,9 @@ int main() {
 
     /* This loop sets up global_array[i] for the next loop.
      * Most of the accesses to the array are likely to happen in the second loop. */
-    /*for (int i = 0; i < MAX; ++i) {
-        global_array[i] = (i+SKIP) % (MAX);
-    }*/
-    global_array[0] = 16;
-    global_array[16] = 16 * 2;
-    global_array[16*2] = 16 * 3;
+    for (int i = 0; i < MAX; ++i) {
+        global_array[i] = (i+16) % (64);
+    }
     prevent_optimizations_based_on_knowing_array_values();
     int j = 0;
 
@@ -98,10 +95,9 @@ int main() {
      * This is where most of the data cache accesses are likely to occur.
      */
     for (int i = 0; i < ITERS; ++i){
-        j = global_array[0];
-        j = global_array[16];
-        j = global_array[16*2];
+        j = global_array[j]; 
     }
+
     /* print out j to ensure that the compiler doesn't optimize the array accesses above away */
     printf("%d\n", j);
 }
