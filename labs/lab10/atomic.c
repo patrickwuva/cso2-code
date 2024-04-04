@@ -16,17 +16,68 @@ double geomean(unsigned char *s, size_t n) {
     return exp(answer);
 }
 
+// map = even split, reduction = atomic
 double geomean1(unsigned char *s, size_t n) {
     double answer = 0;
     #pragma omp parallel for
     for(int i=0; i<n; i+=1) {
-        if (s[i] > 0){ 
+        if (s[i] > 0){
             #pragma omp atomic update
             answer += log(s[i]) / n;
         }
     }
     return exp(answer);
 }
+
+// map = task queue larger task,dynamic schedule, reduction = atomic
+double geomean2(unsigned char *s, size_t n) {
+    double answer = 0;
+    #pragma omp parallel for schedule(dynamic)
+    for(int i = 0; i < n; i+=1){
+        if (s[i] > 0){
+            #pragma omp atomic update
+            answer += log(s[i]) / n;
+        }
+    }
+    return exp(answer);
+}
+
+// map = task queue, reduction = atomic capture update
+double geomean3(unsigned char *s, size_t n) {
+    double answer = 0;
+    int j = 0;
+    #pragma omp parallel
+    while (1) {
+        int i;
+        #pragma omp atomic capture
+        i = j++;
+        if (i >= n) break;
+        
+        if (s[i] > 0){
+            #pragma omp atomic update
+            answer += log(s[i]) / n;
+        }
+    }
+    return exp(answer);
+}
+
+// map = even split, reduction = many to few
+double geomean4(unsigned char *s, size_t n) {
+    double answer = 0;
+    #pragma omp parallel
+    {
+
+        int local = 0;
+        #pragma omp for nowait
+        for(int i = 0; i<n; i+=1){
+            if (s[i] > 0){
+                answer += log(s[i]) / n;
+            }
+        }
+    }
+    return exp(answer);
+}
+
 /// nanoseconds that have elapsed since 1970-01-01 00:00:00 UTC
 long long nsecs() {
     struct timespec t;
@@ -37,6 +88,8 @@ long long nsecs() {
 
 /// reads arguments and invokes geomean; should not require editing
 int main(int argc, char *argv[]) {
+    double (*geomeans[])(unsigned char*, size_t) = {geomean, geomean1, geomean2, geomean3, geomean4};
+
     // step 1: get the input array (the bytes in this file)
     char *s = NULL;
     size_t n = 0;
@@ -56,13 +109,27 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    
     // step 2: invoke and time the geometric mean function
-    long long t0 = nsecs();
-    double answer = geomean1((unsigned char*) s,n);
-    long long t1 = nsecs();
-
+    int iter = 100;
+    for(int i = 0; i < 5; i+=1){
+        double answer = 0;
+        long long t0 = 0;
+        long long t1 = 0;
+        for(int j = 0; j < iter; j+=1){
+            t0 = nsecs();
+            double answer += geomeans[i]((unsigned char*)s, n); 
+            t1 = nsecs();
+        }
+        avg_answer += answer;
+        printf("%lld ns to process %zd characters: %g\n", t1-t0, n, answer);
+    }
     free(s);
-
-    // step 3: report result
-    printf("%lld ns to process %zd characters: %g\n", t1-t0, n, answer);
 }
+
+
+
+
+
+
+
