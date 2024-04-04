@@ -8,7 +8,7 @@
 // computes the geometric mean of a set of values.
 // You should use OpenMP to make faster versions of this.
 // Keep the underlying sum-of-logs approach.
-double geomean(unsigned char *s, size_t n) {
+double geomean0(unsigned char *s, size_t n) {
     double answer = 0;
     for(int i=0; i<n; i+=1) {
         if (s[i] > 0) answer += log(s[i]) / n;
@@ -29,7 +29,7 @@ double geomean1(unsigned char *s, size_t n) {
     return exp(answer);
 }
 
-// map = task queue larger task,dynamic schedule, reduction = atomic
+// map dynamic schedule, reduction = atomic
 double geomean2(unsigned char *s, size_t n) {
     double answer = 0;
     #pragma omp parallel for schedule(dynamic)
@@ -66,15 +66,89 @@ double geomean4(unsigned char *s, size_t n) {
     double answer = 0;
     #pragma omp parallel
     {
-
-        int local = 0;
+        double local = 0;
         #pragma omp for nowait
         for(int i = 0; i<n; i+=1){
+            if(s[i] > 0) {local += log(s[i]) / n;}
+        }
+
+        #pragma omp atomic update
+        answer += local;
+    }
+    return exp(answer);
+}
+// map = task queue, reduction = many to few
+double geomean5(unsigned char *s, size_t n) {
+    double answer = 0;
+    int j = 0;
+    #pragma omp parallel
+    {
+        double local =  0;
+        while (1) {
+            int i;
+            #pragma omp atomic capture
+            i = j++;
+            if (i >= n) break;
+        
             if (s[i] > 0){
-                answer += log(s[i]) / n;
+                local += log(s[i]) / n;
             }
         }
+        #pragma omp atomic update
+        answer += local;
     }
+
+    return exp(answer);
+}
+
+// map dynamic schedule, reduction = many to few
+double geomean6(unsigned char *s, size_t n) {
+    double answer = 0;
+    #pragma omp parallel
+    {
+        double local = 0;
+        #pragma omp for schedule(dynamic) nowait
+        for(int i = 0; i < n; i+=1){
+            if (s[i] > 0){
+                local += log(s[i]) / n;
+            }
+        }
+        #pragma omp atomic update
+        answer += local;
+    }
+    return exp(answer);
+}
+
+double geomean7(unsigned char *s, size_t n){
+    #ifdef OPENMP_ENABLE
+        #pragma omp parallel
+            #pragma omp master
+                int threads = omp_get_num_threads();
+    #else
+        int threads = 1;
+    #endif
+
+    double *results = (double*)malloc(threads * sizeof(double));
+
+    #pragma omp parallel
+    {
+    #ifdef OPENMP_ENABLE
+        int id = omp_get_thread_num();
+    #else
+        int id = 0;
+    #endif
+
+        results[id] = 0;
+        #pragma omp for nowait
+        for(int i =0; i < n; i+=1){
+            if(s[i] > 0) results[id] += log(s[i]) / n;
+        }
+    }
+    double answer = 0;
+    for(int i = 0; i<threads; i+=1){
+        answer += results[i];
+    }
+
     return exp(answer);
 }
 
@@ -88,7 +162,7 @@ long long nsecs() {
 
 /// reads arguments and invokes geomean; should not require editing
 int main(int argc, char *argv[]) {
-    double (*geomeans[])(unsigned char*, size_t) = {geomean, geomean1, geomean2, geomean3, geomean4};
+    double (*geomeans[])(unsigned char*, size_t) = {geomean0, geomean1, geomean2, geomean3, geomean4, geomean5, geomean6, geomean7};
 
     // step 1: get the input array (the bytes in this file)
     char *s = NULL;
@@ -111,18 +185,23 @@ int main(int argc, char *argv[]) {
 
     
     // step 2: invoke and time the geometric mean function
-    int iter = 100;
-    for(int i = 0; i < 5; i+=1){
-        double answer = 0;
-        long long t0 = 0;
-        long long t1 = 0;
+    int iter = 5;
+    for(int i = 0; i < 8; i+=1){
+        long long avg_t0 = 0;
+        double avg_a = 0;
+        long long avg_t1 = 0;
         for(int j = 0; j < iter; j+=1){
-            t0 = nsecs();
-            answer += geomeans[i]((unsigned char*)s, n); 
-            t1 = nsecs();
+            long long t0 = nsecs();
+            double answer = geomeans[i]((unsigned char*)s, n); 
+            long long t1 = nsecs();
+            avg_a += answer;
+            avg_t0 += t0;
+            avg_t1 += t1;
         }
-        answer = answer/iter;
-        printf("%lld ns to process %zd characters: %g\n", t1-t0, n, answer);
+        avg_a = avg_a/iter;
+        avg_t0 = avg_t0/iter;
+        avg_t1 = avg_t1/iter;
+        printf("%lld ns to process %zd characters: %g\n", avg_t1-avg_t0, n, avg_a);
     }
     free(s);
 }
