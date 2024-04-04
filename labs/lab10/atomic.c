@@ -118,10 +118,10 @@ int main(int argc, char *argv[]) {
         long long t1 = 0;
         for(int j = 0; j < iter; j+=1){
             t0 = nsecs();
-            double answer += geomeans[i]((unsigned char*)s, n); 
+            answer += geomeans[i]((unsigned char*)s, n); 
             t1 = nsecs();
         }
-        avg_answer += answer;
+        answer = answer/iter;
         printf("%lld ns to process %zd characters: %g\n", t1-t0, n, answer);
     }
     free(s);
