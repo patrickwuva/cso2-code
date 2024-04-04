@@ -16,6 +16,17 @@ double geomean(unsigned char *s, size_t n) {
     return exp(answer);
 }
 
+double geomean1(unsigned char *s, size_t n) {
+    double answer = 0;
+    #pragma omp parallel for
+    for(int i=0; i<n; i+=1) {
+        if (s[i] > 0){ 
+            #pragma omp atomic update
+            answer += log(s[i]) / n;
+        }
+    }
+    return exp(answer);
+}
 /// nanoseconds that have elapsed since 1970-01-01 00:00:00 UTC
 long long nsecs() {
     struct timespec t;
@@ -47,7 +58,7 @@ int main(int argc, char *argv[]) {
 
     // step 2: invoke and time the geometric mean function
     long long t0 = nsecs();
-    double answer = geomean((unsigned char*) s,n);
+    double answer = geomean1((unsigned char*) s,n);
     long long t1 = nsecs();
 
     free(s);
