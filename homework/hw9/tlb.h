@@ -23,3 +23,24 @@ int tlb_peek(size_t va);
  * update the TLB: just return -1.
  */
 size_t tlb_translate(size_t va);
+typedef struct way{
+    size_t tag;
+    size_t addr;
+    struct way next;
+}way;
+
+typedef struct {
+    int id;
+    old book;
+    way ways[4]; 
+    rway recent;
+}bset;
+
+typedef struct {
+    size_t tlbptr;
+    bset sets[16];
+}tlb
+
+
+
+
