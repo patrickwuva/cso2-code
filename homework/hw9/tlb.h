@@ -25,22 +25,24 @@ int tlb_peek(size_t va);
 size_t tlb_translate(size_t va);
 typedef struct way{
     size_t tag;
-    size_t addr;
-    struct way next;
+    struct *way next;
 }way;
 
 typedef struct {
     int id;
     old book;
-    way ways[4]; 
+    way *ways[4]; 
     rway recent;
 }bset;
 
 typedef struct {
     size_t tlbptr;
-    bset sets[16];
+    bset *sets[16];
 }tlb
 
-
+typedef struct {
+    size_t tag;
+    size_t id
+}tlb_va;
 
 
