@@ -23,27 +23,32 @@ int tlb_peek(size_t va);
  * update the TLB: just return -1.
  */
 size_t tlb_translate(size_t va);
-typedef struct way{
+
+typedef struct way {
     size_t tag;
     size_t pa;
-    struct *way next;
-}way;
+    int id;
+    struct way *next;
+
+} way;
 
 typedef struct {
     int id;
-    size_t addr;
-    way *ways[4]; 
+    way **ways; 
     way *rway;
-}bset;
-
-typedef struct {
-    size_t tp;
-    bset *sets[16];
-}tlb
+} bset;
 
 typedef struct {
     size_t tag;
-    size_t id
-}tva;
+    size_t id;
+    size_t off;
+} tva;
 
-
+void init_tlb(bset ***cache);
+void init_va(tva *v, size_t va);
+bset* init_set(bset *s, int id);
+int get_status(way *rway, size_t t);
+way *get_before(way *rway, way *nway);
+int find_slot(way **ways);
+void update_recent(way *rway, way* before);
+void print_lru(way *rway);

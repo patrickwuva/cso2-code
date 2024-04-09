@@ -3,67 +3,94 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include "tlb.h"
-#include "tools.c"
+#include "config.h"
 
-int SIZE = pow(2,POBITS);
-Tlb tlb;
-tlb.tlbptr = 0;
-
-void create_tlb(){
-    void *base = NULL;
-    posix_memalign(&base, SIZE, SIZE);
-    memset(base, 0, SIZE);
-    tlb.tp= (size_t)base;
-    tlb.sets = {0};
-}
+bset **cachemoney = NULL;
 
 void tlb_clear(){
-    memset(base, 0, SIZE);
+    if (cachemoney != NULL){
+        for (int i = 0; i<16; i++){
+            if (cachemoney[i] != NULL){
+                for(int j = 0; j < 4; j++){
+                    free(cachemoney[i]->ways[j]);
+                }
+                free(cachemoney[i]->ways);
+                free(cachemoney[i]);
+            }
+        }
+        free(cachemoney);
+        cachemoney = NULL;
+    }
 }
 
 int tlb_peek(size_t va){
-    if (tlb.pt == 0) {
-        create_tlb();
+    if (cachemoney == NULL){
+        init_tlb(&cachemoney);
+    }
+    tva v;
+    init_va(&v, va);
+    if (cachemoney[v.id] == NULL) {
         return 0;
     }
-    tlb_va v = init_va(va);
-    if (tlb.sets[v.id]->addr == 0) return 0;
-    bset *curr_set = tlb.sets[v.id];
-    for (int i = 0; i < NWAYS; i++){
-        if (curr_set->ways[i]->tag == v.tag){
-            return get_status(v.tag);
-        }
-    }
-    return 0;
+    return get_status(cachemoney[v.id]->rway, v.tag);
+}
+
+size_t translate(size_t va){
+    if (va < 0x1234000)
+        return va + 0x20000;
+    else if (va > 0x2000000 && va < 0x2345000)
+        return va + 0x100000;
+    else
+        return -1;
 }
 
 size_t tlb_translate(size_t va){
-    if (tlb.tp == 0) create_tlb();
-    tva v;
-    init_va(&v, va)
-    bset s;
-    if (tlb.sets[v.id]->addr == 0){
-        init_set(&s, v.id);
+    if (cachemoney == NULL){
+        init_tlb(&cachemoney);
     }
-    way *ws = s->ways;
+    tva v;
+    init_va(&v, va);
+    if (cachemoney[v.id] == NULL){
+        cachemoney[v.id] = init_set(cachemoney[v.id], v.id);
+    }
+    bset *set = cachemoney[v.id];
+    way **ways = set->ways;
     for (int i = 0; i < NWAYS; i++){
-        if (v.tag == ws[i]->tag){
-            update_recent(ws, rway,i); 
-            return get_status(ws[i]->tag);
+        //printf("vtag 0x%zx\n",ways[i]->tag);
+        if (v.tag == ways[i]->tag){
+            if (ways[i] != set->rway){
+            //print_lru(set->rway);
+            update_recent(set->rway, get_before(set->rway, ways[i])); 
+            }
+        return (ways[i]->pa>>POBITS << POBITS) | v.off; 
         }
     }
-    way nw;
-    int oid = find_slot(ws);
-    if (oid == -1){
-        oid = get_last(ws, s->rway)
-        init_way(&nw, &v, s.addr)
-        
+    int sid = find_slot(ways);
+    if (set->rway == NULL){
+        set->rway = ways[0];
     }
-    int lid = get_last(ws, &s->rway);
-    if (oid == -1){
-        way *lw;
-        
+    else{
+        if (sid == -1){
+            sid = get_before(set->rway,NULL)->id;
+            way *b4 = get_before(set->rway, ways[sid]);
+            ways[sid]->next = set->rway;
+            printf("nid: %d\n", b4->next->id);
+            ways[b4->id]->next = NULL;
+            set->rway = ways[sid];
+            printf("sid: %d b4id: %d rid: %d\n", sid, b4->id, set->rway->next->id);
+        }
+        else{
+            ways[sid]->next = set->rway;
+            set->rway = ways[sid];
+        }
     }
+    ways[sid]->tag = v.tag;
+    ways[sid]->pa = translate(va);
+    if(sid > 1){
+        printf("va: 0x%zx wid: %d id: 0x%zx tag: 0x%zx rid: %d add: 0x%zx rwnid: %d\n",va, sid,v.id, ways[sid]->tag, set->rway->id,ways[sid]->pa | v.off, set->rway->next->id);
+    }
+    //print_lru(set->rway);
+    return ways[sid]->pa | v.off; 
 }
 
 

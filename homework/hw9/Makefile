@@ -1,0 +1,33 @@
+CC = clang
+CFLAGS = -Wall -Wno-unused-variable
+LDFLAGS = -lm
+SRCS := arnold.c tools.c
+OBJS := $(SRCS:.c=.o)
+DEPs := mltp.h config.h
+
+LIB := libmlpt.a
+
+ifeq ($(d),y)
+CFLAGS += -g
+endif
+ifeq ($(f),y)
+CFLAGS += -fsanitize=address
+endif
+ifeq ($(g),y)
+CFLAGS += -g -fsanitize=address
+endif
+all: $(LIB) testexe
+$(LIB): $(OBJS)
+	ar rcs $@ $(OBJS)
+
+%.o: %.c $(DEPS)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	rm -f $(OBJS) $(LIB)
+testexe:
+	$(CC) $(CFLAGS) test.c libmlpt.a -lm -o test
+
+
+.PHONY: all clean test
+
