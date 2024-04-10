@@ -10,7 +10,7 @@ netlab: netlab.o
 	$(CC) netlab.o -o netlab $(LDFLAGS) 
 
 %.o : %.c netsim.h
-	$(CC) -c $(CFLAGS) $< -o $@
+	$(CC) -fPIE -c $(CFLAGS) $< -o $@
 
 
 clean:
