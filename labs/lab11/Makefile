@@ -5,6 +5,7 @@ LDFLAGS = -L. -lnetsim
 .PHONY: all clean
 ifeq ($(p),y)
 CFLAGS += -fPIE
+endif
 all: netlab
 
 netlab: netlab.o
