@@ -6,6 +6,9 @@ LDFLAGS = -L. -lnetsim
 ifeq ($(p),y)
 CFLAGS += -fPIE
 endif
+ifeq ($(g),y)
+CFLAGS += -g -fsanitize=address
+endif
 all: netlab
 
 netlab: netlab.o

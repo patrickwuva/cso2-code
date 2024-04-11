@@ -2,8 +2,18 @@
 #include <stdlib.h>
 #include "netsim.h"
 
-int *seqs = NULL;
-int no_seqs = 0;
+typedef struct{
+    char *data;
+    size_t len;
+    int got_ack;
+    int tid;
+} packet;
+
+packet *packets = NULL;
+
+void init_packets(){
+    packets = calloc(6, sizeof(packet));
+}
 
 int get_csum(char *data){
     int csum = 0;
@@ -13,33 +23,33 @@ int get_csum(char *data){
     return csum;
 }
 
-void ack(void *last){
+void check_ack(void *arg){
+    int id = (int)(long)arg;
+    printf("pgot? %d\n", packets[id].got_ack);
+    if (!packets[id].got_ack){
+        send(packets[id].len, packets[id].data);
+    }
+}
+
+void send_ack(int id){
     char data[5];
-    data[1] = 'A'; data[2] = 'C'; data[3] = 'K'; data[4] = *(int *)last;
+    data[1] = 'A'; data[2] = 'C'; data[3] = 'K'; data[4] = id;
     data[0] = get_csum((char*)data);
-    free(last);
-    send(5,data);
+    packets[id].data = data;
+    packets[id].len = 5;
+    packets[id].got_ack = 0;
+    packets[id].tid = setTimeout(check_ack, 4000, (void*)(long)id);
+    send(5, data);
 }
 
 void recvd(size_t len, void* _data) {
     char *data = _data;
     fwrite(data+3,1,len-3,stdout);
     fflush(stdout);
-    int c_seq = data[1];
-    if(no_seqs == 0){
-        no_seqs = data[2];   
-        seqs = (int *)calloc(no_seqs -1, sizeof(int));
-    }
-    if (c_seq == 1){
-        for (int i = 1; i < no_seqs - 1; i++){
-            int *c_seq_pt = malloc(sizeof(int));
-            *c_seq_pt = i;
-            seqs[c_seq - 1] = setTimeout(ack, 2500, (void *)c_seq_pt);
-        }      
-    }
-    else{
-        clearTimeout(seqs[c_seq - 1]);
-    }
+    int id = data[1];
+    send_ack(id);
+    packets[id].got_ack = 1;
+    clearTimeout(packets[id].tid);
 }
 
 int main(int argc, char *argv[]) {
@@ -49,6 +59,8 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "USAGE: %s n\n    where n is a number between 0 and 3\n", argv[0]);
         return 1;
     }
+    init_packets();
+    
     char data[5];
     data[1] = 'G'; data[2] = 'E'; data[3] = 'T'; data[4] = argv[1][0];
     data[0] = get_csum((char*)data);
