@@ -1,0 +1,16 @@
+#1 map = even split, reduction = atomic
+output: 74704062 ns to process 6306696 characters: 4.75838
+#2 map = dynamic schedule, reduction = atomic
+output: 188024102 ns to process 6306696 characters: 4.75838
+#3 map = task queue, reduction = atomic capture update
+output: 299496806 ns to process 6306696 characters: 4.75838
+#4 map = even split, reduction = many to few
+output: 8010445 ns to process 6306696 characters: 4.75838
+#5 map = task queue, reduction = many to few
+output: 200467880 ns to process 6306696 characters: 4.75838
+#6 map = dynamic schedule, reduction = many to few
+output: 27947413 ns to process 6306696 characters: 4.75838
+#7 map = even split, reduction = fancy reduce
+output: 7766590 ns to process 6306696 characters: 4.75838
+
+#7 was the fastest because it used fancy reduce because it optimized threading and updating the total

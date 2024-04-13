@@ -119,36 +119,40 @@ double geomean6(unsigned char *s, size_t n) {
     return exp(answer);
 }
 
+//map even, reduction = fancy reduce
 double geomean7(unsigned char *s, size_t n){
+    int threads;
     #ifdef OPENMP_ENABLE
         #pragma omp parallel
             #pragma omp master
-                int threads = omp_get_num_threads();
+                threads = omp_get_num_threads();
     #else
-        int threads = 1;
+        threads = 1;
     #endif
-
-    double *results = (double*)malloc(threads * sizeof(double));
-
+    int per_line = 64/sizeof(double);
+    double *results = (double*)malloc(threads * per_line * sizeof(double));
     #pragma omp parallel
     {
-    #ifdef OPENMP_ENABLE
-        int id = omp_get_thread_num();
-    #else
         int id = 0;
-    #endif
-
-        results[id] = 0;
+        #ifdef OPENMP_ENABLE
+            id = omp_get_thread_num();
+        #else
+            id = 0;
+        #endif
+        double sum = 0;
         #pragma omp for nowait
-        for(int i =0; i < n; i+=1){
-            if(s[i] > 0) results[id] += log(s[i]) / n;
+        for(size_t i = 0; i < n; i+=1){
+            if(s[i] > 0){
+                sum += log((double)s[i]) / n;
+            }
         }
+        results[id * per_line] += sum;
     }
     double answer = 0;
     for(int i = 0; i<threads; i+=1){
-        answer += results[i];
+        answer += results[i * per_line];
     }
-
+    free(results);
     return exp(answer);
 }
 
@@ -163,7 +167,7 @@ long long nsecs() {
 /// reads arguments and invokes geomean; should not require editing
 int main(int argc, char *argv[]) {
     double (*geomeans[])(unsigned char*, size_t) = {geomean0, geomean1, geomean2, geomean3, geomean4, geomean5, geomean6, geomean7};
-
+    int geos = 8;
     // step 1: get the input array (the bytes in this file)
     char *s = NULL;
     size_t n = 0;
@@ -186,7 +190,7 @@ int main(int argc, char *argv[]) {
     
     // step 2: invoke and time the geometric mean function
     int iter = 5;
-    for(int i = 0; i < 8; i+=1){
+    for(int i = 0; i < geos; i+=1){
         long long avg_t0 = 0;
         double avg_a = 0;
         long long avg_t1 = 0;
@@ -201,7 +205,7 @@ int main(int argc, char *argv[]) {
         avg_a = avg_a/iter;
         avg_t0 = avg_t0/iter;
         avg_t1 = avg_t1/iter;
-        printf("%lld ns to process %zd characters: %g\n", avg_t1-avg_t0, n, avg_a);
+        printf("geo id: %d %lld ns to process %zd characters: %g\n", i, avg_t1-avg_t0, n, avg_a);
     }
     free(s);
 }
