@@ -21,27 +21,27 @@
 void check_letters(char *buffer, int index){
     char alphabet[26] = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
     int result;
+    long times[26] = {0};
     int t = 5;
-    long slowest = 0;
-    long avg = 0;
     char c_char = '\0';
-    for(int i = 0; i < 26; i++){
-        long total_time = 0;
-        for(int j = 0; j < t; j++){  
-            buffer[index] = alphabet[i];
+    for (int i = 0; i < t; i++){
+        for (int j = 0; j < 26; j++){  
+            buffer[index] = alphabet[j];
             long time_char = measure_once(&result, buffer, check_passphrase);
-            total_time += time_char; 
-           
-
+            times[j] += time_char; 
         }
-        avg = total_time/t;
-        if (avg > slowest){
-            slowest = avg;
-            c_char = alphabet[i];
-        }
-        printf("'%c' took %ld cycles\n", alphabet[i],avg);
     }
-    //printf("slowest: %c\n",c_char);
+    
+    
+    long slowest = 0;
+    for (int i = 0; i < 26; i++){
+        times[i] = times[i]/t;
+        if (times[i] > slowest){
+            slowest = times[i];
+            c_char = alphabet[i];
+            //printf("'%c' took %ld cycles\n", alphabet[i],times[i]);
+        }
+    }
     buffer[index] = c_char;
 }
 
@@ -53,5 +53,9 @@ void find_passphrase(char *buffer, int length) {
     for(int i = 0; i < length; i++){
         check_letters(buffer, i);
     }
-    //printf("buffer: %s\n", buffer);
+    int result;
+    measure_once(&result, buffer, check_passphrase);
+    if (result != 1){
+        find_passphrase(buffer, length);
+    }
 }
