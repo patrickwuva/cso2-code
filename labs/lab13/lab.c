@@ -31,7 +31,8 @@ void check_letters(char *buffer, int index){
             buffer[index] = alphabet[i];
             long time_char = measure_once(&result, buffer, check_passphrase);
             total_time += time_char; 
-            
+           
+
         }
         avg = total_time/t;
         if (avg > slowest){
